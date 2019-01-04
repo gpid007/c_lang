@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+int* pThrdIdArr[1];
+
 void* threadA(void* arg)
 {
     int* iptr = (int*) arg;
@@ -26,14 +28,14 @@ void* threadB(void* arg)
 
 int main()
 {
-    pthread_t threadIdA;
+    pthread_t pThrdIdArr[0];
     int v = 5;
-    pthread_create(&threadIdA, NULL, threadA, &v);
+    pthread_create(&pThrdIdArr[0], NULL, threadA, &v);
     
     pthread_t threadIdB;
     pthread_create(&threadIdB, NULL, &threadB, NULL);
     
-    pthread_join(threadIdA, NULL);
+    pthread_join(pThrdIdArr[0], NULL);
     printf("\nthread's done: v=%d", v);
     pthread_join(threadIdB, NULL);
 

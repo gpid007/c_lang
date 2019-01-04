@@ -1,31 +1,54 @@
-#include <stdio.h>      // handling input output
-#include <stdlib.h>     // size_t, wchar_t, div_t, ldiv_t
-#include <fcntl.h>      // fd = open(...)
-#include <sys/stat.h>   // return file descriptor struct 
-#include <unistd.h>     // POSIX interface for S_IRUSR ...
-#include <sys/mman.h>   // mmap
-#include <errno.h>      // error number explained
-#include <string.h>     // handling strings
-#include <pthread.h>    // thread API
+#include <stdio.h>                   // handling input output
+#include <stdlib.h>                  // size_t, wchar_t, div_t, ldiv_t
+#include <fcntl.h>                   // fd = open(...); file control
+#include <sys/stat.h>                // return file descriptor struct 
+#include <unistd.h>                  // POSIX interface for S_IRUSR ...
+#include <sys/mman.h>                // mmap
+#include <errno.h>                   // error number explained
+#include <string.h>                  // strcpy();
+#include <pthread.h>                 // thread API
 
 
-void* checkArg(int argc, char* argv[]);
+/******************** PROTOTYPE ********************/
+void *getArg(int argc, char *argv[]);
+void *fastOpen(int i);
 
 
-int main(int argc, char* argv[])
+/******************** GLOBAL ********************/ 
+struct File 
 {
-    checkArg(argc, argv);
-    printf("\n");
+    char    name[256];
+    char    delim[2];
+    int     fd;
+    int     size;
+    int     id;
+} fSuct[2];
+
+struct stat st;
+
+
+/******************** MAIN ********************/
+int main(int argc, char *argv[])
+{
+    // ARGUMENT //
+    getArg(argc, argv);
+    
+    for (int i=0; i<2; i++)
+    {
+        fastOpen(i);    
+    }
+
     return 0;
 }
 
 
-void* checkArg(int argc, char* argv[])
+/******************** FUNCTION ********************/ 
+
+//////////////////// CHECK ARG ////////////////////
+void *getArg(int argc, char *argv[])
 {
-    char delim;         // Delimiter
-    int fd;             // FileDesrciptor
-    char* inMemFile;    // inMemoryFile
-    struct stat sv;     // StatVariable
+    int f = 0;
+    int d = 0;
 
     for (int i=0; i<argc; i++)
     {
@@ -35,32 +58,50 @@ void* checkArg(int argc, char* argv[])
             {
                 case 'f':
                 {
-                    fd = open(argv[i+1], O_RDWR, S_IRUSR | S_IWUSR); 
-                 
-                    if (fstat(fd, &sv) == -1)
-                    {
-                        fprintf(stderr, "\n[ERROR %i] %s", errno, strerror(errno));
-                        exit(-1);
-                    }
-                    printf("\nFilesize: %ld Bytes\n", sv.st_size); 
-                    
-                    inMemFile = mmap(NULL, sv.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-                    for (int i=0; i<sv.st_size; i++)
-                    {
-                        printf("%c", inMemFile[i]);
-                    }                 
-                    munmap(inMemFile, sv.st_size);
-                    
-                    close(fd);
+                    strcpy(fSuct[f].name, argv[i+1]);
+                    stat(argv[i+1], &st);
+                    fSuct[f].size = st.st_size;
+                    f++;
                     break;
                 }
                 case 'd':
                 {
-                    delim = argv[i+1][0];
-                    printf("%s", &delim);
+                    strcpy(fSuct[d].delim, &argv[i+1][0]);
+                    d++;
                     break;
                 }
             }
         }
     }
+}
+
+//////////////////// FAST ALLOCATE ////////////////////
+void *fastOpen(int i)
+{
+    // OPEN //
+    fSuct[i].fd = open(fSuct[i].name, O_RDWR, S_IRUSR | S_IWUSR);
+
+    // ERROR //
+    if (fstat(fSuct[i].fd, &st) == -1)
+    {
+        fprintf(stderr, "\n[ERR %i] %s", errno, strerror(errno));
+        exit(-1);
+    }
+
+    // ALLOCATE //
+    char *pMem = mmap(
+        NULL, fSuct[i].size, PROT_READ | PROT_WRITE, MAP_SHARED, 
+        fSuct[i].fd, 0
+    );
+
+    // PRINT FILE //
+    printf("\nPrint %s\n", fSuct[i].name);
+    for (int j=0; j<fSuct[i].size; j++)
+    {
+        printf("%c", pMem[j]);
+    }                 
+
+    // DEALLOCATE & CLOSE //
+    munmap(pMem, fSuct[i].size);
+    close(fSuct[i].fd);
 }
