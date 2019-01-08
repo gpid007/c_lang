@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
-int* pThrdIdArr[1];
+#define N 1
+
+
+int* pThrdIdArr[N];
 
 void* threadA(void* arg)
 {
