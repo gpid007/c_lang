@@ -27,7 +27,7 @@ struct File
     char    *pMem;
     int     fd;
     int     size;
-} fSuct[N];
+} fs[N];
 
 // FILE DESCRIPTIOR STRUCT //
 struct stat st;
@@ -73,16 +73,16 @@ void *getArg(int argc, char *argv[])
                 case 'f':
                 {
                     // FILE FLAG //
-                    fSuct[f].name = argv[i+1];
+                    fs[f].name = argv[i+1];
                     stat(argv[i+1], &st);
-                    fSuct[f].size = st.st_size;
+                    fs[f].size = st.st_size;
                     f++;
                     break;
                 }
                 case 'd':
                 {
                     // DELIMITER FLAG //
-                    fSuct[d].delim = argv[i+1];
+                    fs[d].delim = argv[i+1];
                     d++;
                     break;
                 }
@@ -95,23 +95,23 @@ void *getArg(int argc, char *argv[])
 void *fastOpen(int i)
 {
     // OPEN //
-    fSuct[i].fd = open(fSuct[i].name, O_RDWR, S_IRUSR | S_IWUSR);
+    fs[i].fd = open(fs[i].name, O_RDWR, S_IRUSR | S_IWUSR);
 
     // ERROR //
-    if (fstat(fSuct[i].fd, &st) == -1)
+    if (fstat(fs[i].fd, &st) == -1)
     {
         fprintf(stderr, "\n[ERR %i] %s", errno, strerror(errno));
         exit(-1);
     }
 
     // DYNAMICALLY ALLOCATE //
-    fSuct[i].pMem = mmap
+    fs[i].pMem = mmap
     (
           NULL
-        , fSuct[i].size
+        , fs[i].size
         , PROT_READ | PROT_WRITE
         , MAP_SHARED
-        , fSuct[i].fd
+        , fs[i].fd
         , 0
     );
 }
@@ -120,10 +120,10 @@ void *fastOpen(int i)
 void *fastPrint(int i)
 {
     // PRINT FILE //
-    printf("\nPrint %s\n", fSuct[i].name);
-    for (int j=0; j<fSuct[i].size; j++)
+    printf("\nPrint %s\n", fs[i].name);
+    for (int j=0; j<fs[i].size; j++)
     {
-        printf("%c", fSuct[i].pMem[j]);
+        printf("%c", fs[i].pMem[j]);
     }                 
 }
 
@@ -131,6 +131,6 @@ void *fastPrint(int i)
 void *fastClose(int i)
 {
     // DEALLOCATE & CLOSE //
-    munmap(fSuct[i].pMem, fSuct[i].size);
-    close(fSuct[i].fd);
+    munmap(fs[i].pMem, fs[i].size);
+    close(fs[i].fd);
 }
