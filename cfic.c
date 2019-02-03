@@ -16,14 +16,12 @@
 
 // PROTOTYPE
 int getIN();
+void help();
 
 // MAIN
 int main()
 {
-    printf("\n\t\tC-FIC\n\tC - Float Interpreted Calculator");
-    printf("\n\n# Operators [+-*/]\n# Delimiters [; ,]");
-    printf("\n# Interpretation [FIFO]\n# FIFO evaluation [2 + 3 / 5] = [1]");
-    printf("\n# [exit] to quit\n");
+    help();
     int RUN = 1;
     while (RUN > 0)
     {
@@ -51,6 +49,14 @@ int getIN()
     while (token != NULL)
     {   
         // HANDLE ERROR
+        if (strcmp("exit\n", token) == 0)
+        {
+            return 0;
+        }
+        if (strcmp("help\n", token) == 0)
+        {
+            help();
+        }
         if (strchr(OPR, (char) *token))
         {
             opr = (char) *token;
@@ -81,12 +87,14 @@ int getIN()
         token = strtok(NULL, DELIM);
         ctr++;
     }
-    // PRINT RESULT
-    printf(">>> %f", eval);
+    printf("\n>>> %f", eval);
+}
 
-    // EXIT
-    if (strcmp("exit\n", IN) == 0)
-        return 0;
-    else
-        return 1;
+void help()
+{
+    printf("\nC - Float Interpreted Calculator (C-FIC)");
+    printf("\n\n# Pronounced as in [speCIFIC]");
+    printf("\n# Operators [+-*/]\n# Delimiters [; ,]");
+    printf("\n# Interpretation [FIFO]\n# To quit [exit]\n# For help [help]");
+    printf("\n");
 }
