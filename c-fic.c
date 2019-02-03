@@ -95,6 +95,7 @@ void help()
     printf("\nC - Float Interpreted Calculator (C-FIC)");
     printf("\n\n# Pronounced as in [speCIFIC]");
     printf("\n# Operators [+-*/]\n# Delimiters [; ,]");
-    printf("\n# Interpretation [FIFO]\n# To quit [exit]\n# For help [help]");
+    printf("\n# Interpretation [FIFO] [2 + 3 / 5 = 1]");
+    printf("\n# To quit [exit]\n# For help [help]");
     printf("\n");
 }
