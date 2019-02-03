@@ -1,67 +1,58 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-#define SIZE 10
+// PROTOTYPE
+void swap(int *a, int *b);
+void quicksort(int *target, int left, int right);
 
-void swap(int *x, int *y);
-int pivot(int i, int j);
-void quicksort(int list[], int m, int n);
-void display(int list[], const int n);
- 
-int main()
+// MAIN
+int main() 
 {
-    int list[SIZE];
-    for(int i = 0; i<SIZE; i++)
-        list[i] = rand();
- 
-    display(list, SIZE);
-    quicksort(list, 0, SIZE-1);
-    display(list, SIZE);
+    int len;
+    int arr[] = { 2, 6, 3, 8, 5, 4, 1, 9, 7, 1 };
+    len = (sizeof(arr)/sizeof(int));
 
+    quicksort(arr, 0, len);
+
+    for(int i=0; i<len; i++)
+        printf("%d ", arr[i]);
+
+    printf("\n");
     return 0;
 }
- 
-void swap(int *x, int *y)
+
+// FUNCTION
+void quicksort(int *target, int left, int right) 
 {
-    int temp;
-    temp = *x;
-    *x = *y;
-    *y = temp;
-}
- 
-int pivot(int i, int j)
-{
-    return((i + j) / 2);
-}
- 
-void quicksort(int list[], int m, int n)
-{
-    int key, i, j, k;
-    if (m < n)
+    if (left >= right) 
+        return;
+
+    int l = left;
+    int r = right;
+    int pivot = target[l];
+    
+    for(;;) 
     {
-        k = pivot(m, n);
-        swap(&list[m], &list[k]);
-        key = list[m];
-        i = m + 1;
-        j = n;
-        while (i<=j)
-        {
-            while ((i <= n) && (list[i] <= key))
-                i++;
-            while ((j >= m) && (list[j] > key))
-                j--;
-            if (i < j)
-                swap(&list[i], &list[j]);
-        }
-        swap(&list[m], &list[j]);
-        quicksort(list, m, j-1);
-        quicksort(list, j+1, n);
+        if (l >= r) 
+            break;
+        while (target[l] < pivot)
+            l++;
+        while (pivot < target[r])
+            r++;
+        swap( &target[l], &target[r]);
+        if (target[l] < pivot) 
+            l++;
+        if (pivot < target[r]) 
+            r--;
     }
+
+    quicksort(target, left, l-1);
+    quicksort(target, r+1, right);
 }
 
-void display(int list[], const int n)
+void swap(int *a, int *b)
 {
-    printf("\n");
-    for(int i=0; i<n; i++)
-        printf("%d ",list[i]);
+    int tmp;
+    tmp = *a;
+    *a = *b;
+    *b = tmp;
 }
